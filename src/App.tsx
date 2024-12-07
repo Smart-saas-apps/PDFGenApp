@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toolbar } from './components/editor/Toolbar';
+import Toolbar from './components/editor/Toolbar';
 import { DesignCanvas } from './components/editor/DesignCanvas';
 import { PDFPreview } from './components/editor/PDFPreview';
 import { TemplateManager } from './components/editor/TemplateManager';

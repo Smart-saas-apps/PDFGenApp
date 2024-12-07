@@ -1,111 +1,89 @@
 import React from 'react';
+import { FaFont, FaImage, FaTable, FaQrcode, FaList, FaTrash, FaCopy,
+  FaSquare, FaCircle, FaCaretUp, FaStar, FaGem, FaMinus, FaArrowRight,
+  FaAlignLeft, FaAlignCenter, FaAlignRight, FaAlignJustify,
+  FaBold, FaItalic, FaUnderline,
+  FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { useTemplateStore } from '../../store/templateStore';
-import { Button } from '../ui/Button';
-import {
-  DocumentTextIcon,
-  PhotoIcon,
-  SquaresPlusIcon,
-  ArrowDownTrayIcon,
-  ArrowPathIcon,
-  TrashIcon,
-  DocumentDuplicateIcon,
-  TableCellsIcon,
-  QrCodeIcon,
-  ListBulletIcon
-} from '@heroicons/react/24/outline';
-import { NewTextElement, NewImageElement, NewShapeElement, NewTableElement, NewQRCodeElement, NewListElement } from '../../types';
+import { NewElement } from '../../types';
 
-export const Toolbar: React.FC = () => {
-  const { addElement, deleteElement, selectedElementId } = useTemplateStore();
+const Toolbar: React.FC = () => {
+  const { addElement, selectedElementId, deleteElement, updateElement } = useTemplateStore();
 
   const handleAddText = () => {
-    const newElement: NewTextElement = {
+    const newElement: NewElement = {
       type: 'text',
       content: 'New Text',
-      position: { x: 50, y: 50 },
+      position: { x: 100, y: 100 },
       size: { width: 200, height: 50 },
-      style: {
-        fontFamily: 'Arial',
-        fontSize: '16px',
-        color: '#000000',
-      },
+      style: { fontSize: '16px', fontFamily: 'Arial' },
+      zIndex: 1,
     };
     addElement(newElement);
   };
 
   const handleAddImage = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const newElement: NewImageElement = {
-            type: 'image',
-            content: e.target?.result as string,
-            position: { x: 50, y: 50 },
-            size: { width: 200, height: 200 },
-            style: {},
-            alt: file.name,
-          };
-          addElement(newElement);
-        };
-        reader.readAsDataURL(file);
-      }
+    const newElement: NewElement = {
+      type: 'image',
+      content: 'placeholder.jpg',
+      alt: 'Image description',
+      position: { x: 100, y: 100 },
+      size: { width: 200, height: 200 },
+      style: {},
+      zIndex: 1,
     };
-    input.click();
+    addElement(newElement);
   };
 
-  const handleAddShape = () => {
-    const newElement: NewShapeElement = {
+  const handleAddShape = (shape: 'rectangle' | 'circle' | 'triangle' | 'star' | 'hexagon' | 'line' | 'arrow') => {
+    const newElement: NewElement = {
       type: 'shape',
-      shape: 'rectangle',
+      shape,
       content: '',
-      position: { x: 50, y: 50 },
+      backgroundColor: '#e2e8f0',
+      borderColor: '#64748b',
+      borderWidth: 1,
+      rotation: 0,
+      position: { x: 100, y: 100 },
       size: { width: 100, height: 100 },
       style: {},
-      backgroundColor: '#4B5563',
+      zIndex: 1,
     };
     addElement(newElement);
   };
 
   const handleAddTable = () => {
-    const newElement: NewTableElement = {
+    const newElement: NewElement = {
       type: 'table',
-      content: [['Header 1', 'Header 2'], ['Cell 1', 'Cell 2']],
-      position: { x: 50, y: 50 },
-      size: { width: 300, height: 150 },
-      style: {
-        borderCollapse: 'collapse',
-        border: '1px solid #ccc',
-      },
+      content: [['Cell 1', 'Cell 2'], ['Cell 3', 'Cell 4']],
+      position: { x: 100, y: 100 },
+      size: { width: 300, height: 200 },
+      style: {},
+      zIndex: 1,
     };
     addElement(newElement);
   };
 
   const handleAddQRCode = () => {
-    const newElement: NewQRCodeElement = {
+    const newElement: NewElement = {
       type: 'qrcode',
       content: 'https://example.com',
-      position: { x: 50, y: 50 },
-      size: { width: 100, height: 100 },
+      position: { x: 100, y: 100 },
+      size: { width: 150, height: 150 },
       style: {},
+      zIndex: 1,
     };
     addElement(newElement);
   };
 
   const handleAddList = () => {
-    const newElement: NewListElement = {
+    const newElement: NewElement = {
       type: 'list',
       content: ['Item 1', 'Item 2', 'Item 3'],
-      position: { x: 50, y: 50 },
+      position: { x: 100, y: 100 },
       size: { width: 200, height: 150 },
-      style: {
-        listStyle: 'disc',
-        paddingLeft: '20px',
-      },
+      style: {},
+      zIndex: 1,
     };
     addElement(newElement);
   };
@@ -118,126 +96,142 @@ export const Toolbar: React.FC = () => {
 
   const handleDuplicateElement = () => {
     if (selectedElementId) {
-      const element = useTemplateStore.getState().activeTemplate?.elements.find(
-        (el) => el.id === selectedElementId
-      );
-      if (element) {
-        const { id, ...elementWithoutId } = element;
-        addElement({
-          ...elementWithoutId,
-          position: {
-            x: element.position.x + 20,
-            y: element.position.y + 20,
-          },
-        });
-      }
+      // Logic to duplicate the selected element
+    }
+  };
+
+  const handleTextStyle = (style: 'bold' | 'italic' | 'underline') => {
+    if (selectedElementId) {
+      updateElement(selectedElementId, {
+        style: { fontWeight: style === 'bold' ? 'bold' : undefined,
+                fontStyle: style === 'italic' ? 'italic' : undefined,
+                textDecoration: style === 'underline' ? 'underline' : undefined }
+      });
+    }
+  };
+
+  const handleAlignment = (alignment: 'left' | 'center' | 'right' | 'justify') => {
+    if (selectedElementId) {
+      updateElement(selectedElementId, {
+        style: { textAlign: alignment }
+      });
+    }
+  };
+
+  const handleLayer = (direction: 'up' | 'down') => {
+    if (selectedElementId) {
+      updateElement(selectedElementId, {
+        zIndex: direction === 'up' ? 1 : -1
+      });
     }
   };
 
   return (
-    <div className="px-4 py-2 flex items-center justify-between border-b border-gray-200">
-      <div className="flex items-center gap-3">
-        {/* Insert Elements */}
-        <div className="flex items-center gap-2 border-r pr-3 border-gray-200">
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            onClick={handleAddText}
-            title="Add Text"
-          >
-            <DocumentTextIcon className="w-4 h-4" />
-            Text
-          </button>
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            onClick={handleAddImage}
-            title="Add Image"
-          >
-            <PhotoIcon className="w-4 h-4" />
-            Image
-          </button>
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            onClick={handleAddShape}
-            title="Add Shape"
-          >
-            <SquaresPlusIcon className="w-4 h-4" />
-            Shape
-          </button>
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            onClick={handleAddTable}
-            title="Add Table"
-          >
-            <TableCellsIcon className="w-4 h-4" />
-            Table
-          </button>
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            onClick={handleAddQRCode}
-            title="Add QR Code"
-          >
-            <QrCodeIcon className="w-4 h-4" />
-            QR Code
-          </button>
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            onClick={handleAddList}
-            title="Add List"
-          >
-            <ListBulletIcon className="w-4 h-4" />
-            List
-          </button>
-        </div>
-
-        {/* Element Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm ${
-              selectedElementId
-                ? 'text-gray-700 hover:bg-gray-100'
-                : 'text-gray-400 cursor-not-allowed'
-            } rounded-md transition-colors`}
-            onClick={handleDeleteElement}
-            disabled={!selectedElementId}
-            title="Delete Element"
-          >
-            <TrashIcon className="w-4 h-4" />
-            Delete
-          </button>
-          <button
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm ${
-              selectedElementId
-                ? 'text-gray-700 hover:bg-gray-100'
-                : 'text-gray-400 cursor-not-allowed'
-            } rounded-md transition-colors`}
-            onClick={handleDuplicateElement}
-            disabled={!selectedElementId}
-            title="Duplicate Element"
-          >
-            <DocumentDuplicateIcon className="w-4 h-4" />
-            Duplicate
-          </button>
-        </div>
+    <div className="flex items-center gap-2 p-2 bg-white shadow-md">
+      {/* Basic Elements */}
+      <div className="flex items-center gap-2">
+        <button onClick={handleAddText} className="p-1 hover:bg-gray-100 rounded" title="Add Text">
+          <FaFont className="w-4 h-4" />
+        </button>
+        <button onClick={handleAddImage} className="p-1 hover:bg-gray-100 rounded" title="Add Image">
+          <FaImage className="w-4 h-4" />
+        </button>
+        <button onClick={handleAddTable} className="p-1 hover:bg-gray-100 rounded" title="Add Table">
+          <FaTable className="w-4 h-4" />
+        </button>
+        <button onClick={handleAddQRCode} className="p-1 hover:bg-gray-100 rounded" title="Add QR Code">
+          <FaQrcode className="w-4 h-4" />
+        </button>
+        <button onClick={handleAddList} className="p-1 hover:bg-gray-100 rounded" title="Add List">
+          <FaList className="w-4 h-4" />
+        </button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-          onClick={() => {}}
-          title="Reset Canvas"
-        >
-          <ArrowPathIcon className="w-4 h-4" />
-          Reset
+      <div className="h-4 w-px bg-gray-200" />
+
+      {/* Shapes */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => handleAddShape('rectangle')} className="p-1 hover:bg-gray-100 rounded" title="Rectangle">
+          <FaSquare className="w-4 h-4" />
         </button>
-        <button
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors"
-          onClick={() => {}}
-          title="Export PDF"
-        >
-          <ArrowDownTrayIcon className="w-4 h-4" />
-          Export PDF
+        <button onClick={() => handleAddShape('circle')} className="p-1 hover:bg-gray-100 rounded" title="Circle">
+          <FaCircle className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAddShape('triangle')} className="p-1 hover:bg-gray-100 rounded" title="Triangle">
+          <FaCaretUp className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAddShape('star')} className="p-1 hover:bg-gray-100 rounded" title="Star">
+          <FaStar className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAddShape('hexagon')} className="p-1 hover:bg-gray-100 rounded" title="Hexagon">
+          <FaGem className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAddShape('line')} className="p-1 hover:bg-gray-100 rounded" title="Line">
+          <FaMinus className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAddShape('arrow')} className="p-1 hover:bg-gray-100 rounded" title="Arrow">
+          <FaArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="h-4 w-px bg-gray-200" />
+
+      {/* Text Formatting */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => handleTextStyle('bold')} className="p-1 hover:bg-gray-100 rounded" title="Bold">
+          <FaBold className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleTextStyle('italic')} className="p-1 hover:bg-gray-100 rounded" title="Italic">
+          <FaItalic className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleTextStyle('underline')} className="p-1 hover:bg-gray-100 rounded" title="Underline">
+          <FaUnderline className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="h-4 w-px bg-gray-200" />
+
+      {/* Alignment */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => handleAlignment('left')} className="p-1 hover:bg-gray-100 rounded" title="Align Left">
+          <FaAlignLeft className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAlignment('center')} className="p-1 hover:bg-gray-100 rounded" title="Align Center">
+          <FaAlignCenter className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAlignment('right')} className="p-1 hover:bg-gray-100 rounded" title="Align Right">
+          <FaAlignRight className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleAlignment('justify')} className="p-1 hover:bg-gray-100 rounded" title="Justify">
+          <FaAlignJustify className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="h-4 w-px bg-gray-200" />
+
+      {/* Layer Controls */}
+      <div className="flex items-center gap-2">
+        <button onClick={() => handleLayer('up')} className="p-1 hover:bg-gray-100 rounded" title="Bring Forward">
+          <FaArrowUp className="w-4 h-4" />
+        </button>
+        <button onClick={() => handleLayer('down')} className="p-1 hover:bg-gray-100 rounded" title="Send Backward">
+          <FaArrowDown className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="h-4 w-px bg-gray-200" />
+
+      {/* Element Actions */}
+      <div className="flex items-center gap-2">
+        <button onClick={handleDeleteElement} className="p-1 hover:bg-gray-100 rounded" title="Delete">
+          <FaTrash className="w-4 h-4" />
+        </button>
+        <button onClick={handleDuplicateElement} className="p-1 hover:bg-gray-100 rounded" title="Duplicate">
+          <FaCopy className="w-4 h-4" />
         </button>
       </div>
     </div>
   );
 };
+
+export default Toolbar;

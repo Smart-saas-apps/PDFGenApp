@@ -60,9 +60,12 @@ export interface ImageElement extends BaseElement {
 
 export interface ShapeElement extends BaseElement {
   type: 'shape';
-  shape: 'rectangle' | 'circle';
+  shape: 'rectangle' | 'circle' | 'triangle' | 'star' | 'hexagon' | 'line' | 'arrow';
   content: string;
   backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  rotation?: number;
 }
 
 export interface TableElement extends BaseElement {
@@ -101,9 +104,12 @@ export interface NewImageElement extends BaseNewElement {
 
 export interface NewShapeElement extends BaseNewElement {
   type: 'shape';
-  shape: 'rectangle' | 'circle';
+  shape: 'rectangle' | 'circle' | 'triangle' | 'star' | 'hexagon' | 'line' | 'arrow';
   content: string;
   backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  rotation?: number;
 }
 
 export interface NewTableElement extends BaseNewElement {
