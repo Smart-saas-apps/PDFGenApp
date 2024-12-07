@@ -24,6 +24,22 @@ export const DesignCanvas: React.FC = () => {
           <div
             style={elementStyle}
             className="w-full h-full flex items-center"
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => {
+              const newContent = e.currentTarget.textContent || '';
+              if (newContent !== element.content) {
+                useTemplateStore.getState().updateElement(element.id, {
+                  content: newContent
+                });
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                e.currentTarget.blur();
+              }
+            }}
           >
             {element.content}
           </div>
