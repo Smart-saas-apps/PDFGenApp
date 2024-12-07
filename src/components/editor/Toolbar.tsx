@@ -59,58 +59,46 @@ export const Toolbar: React.FC = () => {
   };
 
   return (
-    <div className="px-4 py-2 flex items-center justify-between">
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={<DocumentTextIcon className="w-5 h-5" />}
-            title="Add Text"
-            onClick={handleAddText}
-          >
-            Text
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={<PhotoIcon className="w-5 h-5" />}
-            title="Add Image"
-            onClick={handleAddImage}
-          >
-            Image
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={<SquaresPlusIcon className="w-5 h-5" />}
-            title="Add Shape"
-            onClick={handleAddShape}
-          >
-            Shape
-          </Button>
-        </div>
+    <div className="px-4 py-2 flex items-center justify-between border-b border-gray-200">
+      <div className="flex items-center gap-3">
+        <button
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          onClick={handleAddText}
+        >
+          <DocumentTextIcon className="w-4 h-4" />
+          Text
+        </button>
+        <button
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          onClick={handleAddImage}
+        >
+          <PhotoIcon className="w-4 h-4" />
+          Image
+        </button>
+        <button
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          onClick={handleAddShape}
+        >
+          <SquaresPlusIcon className="w-4 h-4" />
+          Shape
+        </button>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          icon={<ArrowPathIcon className="w-5 h-5" />}
-          title="Reset Canvas"
+      <div className="flex items-center gap-3">
+        <button
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
           onClick={handleResetCanvas}
         >
+          <ArrowPathIcon className="w-4 h-4" />
           Reset
-        </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          icon={<ArrowDownTrayIcon className="w-5 h-5" />}
-          title="Export PDF"
+        </button>
+        <button
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors"
           onClick={handleExportPDF}
         >
+          <ArrowDownTrayIcon className="w-4 h-4" />
           Export PDF
-        </Button>
+        </button>
       </div>
     </div>
   );

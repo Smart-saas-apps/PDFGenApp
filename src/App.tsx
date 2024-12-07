@@ -11,15 +11,15 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
-        <div className="px-4 py-3">
-          <h1 className="text-xl font-semibold text-gray-900">PDF Designer</h1>
+        <div className="px-4 py-2">
+          <h1 className="text-lg font-semibold text-gray-900">PDF Designer</h1>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100vh-57px)]">
+      <div className="flex h-[calc(100vh-45px)]">
         {/* Left Sidebar */}
-        <div className="w-64 border-r border-gray-200 bg-white overflow-y-auto">
+        <div className="w-52 border-r border-gray-200 bg-white overflow-y-auto">
           <TemplateManager />
         </div>
 
@@ -40,9 +40,9 @@ const App: React.FC = () => {
             </div>
 
             {/* Preview Panel */}
-            <div className="w-80 border-l border-gray-200 bg-white overflow-y-auto">
-              <div className="p-4">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">Preview</h2>
+            <div className="w-64 border-l border-gray-200 bg-white overflow-y-auto">
+              <div className="p-3">
+                <h2 className="text-sm font-medium text-gray-900 mb-3">Preview</h2>
                 <PDFPreview />
               </div>
             </div>

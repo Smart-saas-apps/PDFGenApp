@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useTemplateStore } from '../../store/templateStore';
-import { Button } from '../ui/Button';
-import { DocumentArrowDownIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import { generatePDF, downloadPDF } from '../../utils/pdfGenerator';
 
 export const PDFPreview: React.FC = () => {
@@ -40,21 +39,23 @@ export const PDFPreview: React.FC = () => {
     <div className="p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium text-gray-900">Preview</h2>
-        <div className="flex gap-2">
-          <Button
+        <div className="flex gap-2 text-sm">
+          <button
             onClick={handlePreview}
             disabled={!activeTemplate || isGenerating}
-            icon={<EyeIcon className="w-5 h-5" />}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50"
           >
+            <EyeIcon className="w-3.5 h-3.5" />
             Preview
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={handleDownload}
             disabled={!activeTemplate || isGenerating}
-            icon={<DocumentArrowDownIcon className="w-5 h-5" />}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600"
           >
+            <DocumentArrowDownIcon className="w-3.5 h-3.5" />
             Download
-          </Button>
+          </button>
         </div>
       </div>
 
