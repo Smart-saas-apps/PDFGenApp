@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTemplateStore } from '../../store/templateStore';
 import { EyeIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
-import { generatePDF } from '../../utils/pdfGenerator';
+import { PreviewCanvas } from './PDFPreview/PreviewCanvas';
 
 export const PDFPreview: React.FC = () => {
   const { activeTemplate } = useTemplateStore();
@@ -13,7 +13,34 @@ export const PDFPreview: React.FC = () => {
     
     try {
       setIsGenerating(true);
-      const pdfUrl = await generatePDF(activeTemplate);
+      const element = document.getElementById('pdf-canvas');
+      if (!element) {
+        throw new Error('Preview canvas not found');
+      }
+
+      // Use html2canvas directly here for better control
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        backgroundColor: '#ffffff',
+      });
+
+      // Use jsPDF directly here
+      const { jsPDF } = await import('jspdf');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgData = canvas.toDataURL('image/png');
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      const pdfUrl = pdf.output('dataurlstring');
       setPreviewUrl(pdfUrl);
     } catch (error) {
       console.error('Error generating preview:', error);
@@ -27,15 +54,33 @@ export const PDFPreview: React.FC = () => {
     
     try {
       setIsGenerating(true);
-      const pdfUrl = await generatePDF(activeTemplate);
+      const element = document.getElementById('pdf-canvas');
+      if (!element) {
+        throw new Error('Preview canvas not found');
+      }
+
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        backgroundColor: '#ffffff',
+      });
+
+      const { jsPDF } = await import('jspdf');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgData = canvas.toDataURL('image/png');
       
-      // Create a link element and trigger download
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = `${activeTemplate.name || 'document'}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      pdf.save(`${activeTemplate.name || 'document'}.pdf`);
     } catch (error) {
       console.error('Error downloading PDF:', error);
     } finally {
@@ -45,15 +90,25 @@ export const PDFPreview: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="bg-gray-50 rounded-md flex items-center justify-center overflow-hidden">
-        {previewUrl ? (
-          <iframe 
-            src={previewUrl} 
-            className="w-full h-[500px] border-0"
-            title="PDF Preview"
-          />
+      <div className="bg-white rounded-md flex items-center justify-center overflow-hidden">
+        {isGenerating ? (
+          <div className="py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
         ) : (
-          <p className="text-sm text-gray-500 py-20">Preview will appear here</p>
+          <>
+            {previewUrl ? (
+              <iframe 
+                src={previewUrl} 
+                className="w-full h-[500px] border-0"
+                title="PDF Preview"
+              />
+            ) : (
+              <div className="relative w-full">
+                <PreviewCanvas />
+              </div>
+            )}
+          </>
         )}
       </div>
       
@@ -64,7 +119,7 @@ export const PDFPreview: React.FC = () => {
           disabled={!activeTemplate || isGenerating}
         >
           <EyeIcon className="w-3.5 h-3.5" />
-          Preview
+          {isGenerating ? 'Generating...' : 'Preview'}
         </button>
         <button 
           className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50"
@@ -72,7 +127,7 @@ export const PDFPreview: React.FC = () => {
           disabled={!activeTemplate || isGenerating}
         >
           <DocumentArrowDownIcon className="w-3.5 h-3.5" />
-          Download
+          {isGenerating ? 'Generating...' : 'Download'}
         </button>
       </div>
     </div>
