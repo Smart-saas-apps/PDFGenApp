@@ -20,9 +20,8 @@ export interface ElementStyle {
   [key: string]: any;
 }
 
-export interface BaseTemplateElement {
+export interface BaseElement {
   id: string;
-  type: string;
   position: Position;
   size: Size;
   style: ElementStyle;
@@ -30,16 +29,16 @@ export interface BaseTemplateElement {
   zIndex?: number;
 }
 
-export interface TextElement extends BaseTemplateElement {
+export interface TextElement extends BaseElement {
   type: 'text';
 }
 
-export interface ImageElement extends BaseTemplateElement {
+export interface ImageElement extends BaseElement {
   type: 'image';
   alt?: string;
 }
 
-export interface ShapeElement extends BaseTemplateElement {
+export interface ShapeElement extends BaseElement {
   type: 'shape';
   shape: 'rectangle' | 'circle';
   backgroundColor?: string;
