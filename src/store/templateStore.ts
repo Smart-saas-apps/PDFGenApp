@@ -1,154 +1,179 @@
 import { create } from 'zustand';
-import { Template, TemplateElement, ElementType } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { Template, TemplateElement, ElementType, Position, Size } from '../types';
 
 interface TemplateStore {
   templates: Template[];
-  activeTemplate: Template & { selectedElementId?: string } | null;
-  setActiveTemplate: (template: Template) => void;
+  activeTemplate: Template | null;
+  selectedElementId: string | null;
   createTemplate: (name: string) => void;
-  saveTemplate: () => void;
-  addElement: (type: ElementType, defaultProps?: Partial<TemplateElement>) => void;
+  addElement: (type: ElementType, props?: Partial<TemplateElement>) => void;
   updateElement: (elementId: string, updates: Partial<TemplateElement>) => void;
-  removeElement: (elementId: string) => void;
-  selectElement: (elementId: string) => void;
+  moveElement: (elementId: string, position: Position) => void;
+  resizeElement: (elementId: string, size: Size) => void;
   duplicateElement: (elementId: string) => void;
-  moveElement: (elementId: string, position: { x: number; y: number }) => void;
+  removeElement: (elementId: string) => void;
+  setSelectedElementId: (elementId: string | null) => void;
 }
+
+const createDefaultElement = (type: ElementType, props: Partial<TemplateElement> = {}): TemplateElement => {
+  const defaultSizes: Record<ElementType, Size> = {
+    text: { width: 200, height: 50 },
+    image: { width: 200, height: 200 },
+    shape: { width: 100, height: 100 },
+    table: { width: 400, height: 200 },
+  };
+
+  return {
+    id: uuidv4(),
+    type,
+    position: { x: 50, y: 50 },
+    size: defaultSizes[type],
+    content: '',
+    style: {},
+    ...props,
+  };
+};
 
 export const useTemplateStore = create<TemplateStore>((set) => ({
   templates: [],
   activeTemplate: null,
-  
-  setActiveTemplate: (template) => set({ activeTemplate: template }),
-  
-  createTemplate: (name) => set((state) => ({
-    templates: [...state.templates, {
-      id: crypto.randomUUID(),
+  selectedElementId: null,
+
+  createTemplate: (name) => {
+    const now = new Date().toISOString();
+    const newTemplate: Template = {
+      id: uuidv4(),
       name,
+      description: '',
       elements: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }],
-  })),
-  
-  saveTemplate: () => set((state) => ({
-    templates: state.activeTemplate
-      ? state.templates.map((t) =>
-          t.id === state.activeTemplate?.id
-            ? { ...state.activeTemplate, updatedAt: new Date().toISOString() }
-            : t
-        )
-      : state.templates,
-  })),
-  
-  addElement: (type, defaultProps = {}) =>
+      createdAt: now,
+      updatedAt: now,
+    };
+
     set((state) => ({
-      activeTemplate: state.activeTemplate
-        ? {
-            ...state.activeTemplate,
-            elements: [
-              ...state.activeTemplate.elements,
-              {
-                id: crypto.randomUUID(),
-                type,
-                content: '',
-                position: {
-                  x: 50,
-                  y: 50,
-                  width: 200,
-                  height: type === 'text' ? 50 : 200,
-                  rotation: 0,
-                },
-                style: {},
-                ...defaultProps,
-              },
-            ],
-          }
-        : null,
-    })),
-    
-  updateElement: (elementId, updates) =>
-    set((state) => ({
-      activeTemplate: state.activeTemplate
-        ? {
-            ...state.activeTemplate,
-            elements: state.activeTemplate.elements.map((el) =>
-              el.id === elementId ? { ...el, ...updates } : el
-            ),
-            updatedAt: new Date().toISOString(),
-          }
-        : null,
-    })),
-    
-  removeElement: (elementId) =>
-    set((state) => ({
-      activeTemplate: state.activeTemplate
-        ? {
-            ...state.activeTemplate,
-            elements: state.activeTemplate.elements.filter((el) => el.id !== elementId),
-            selectedElementId: state.activeTemplate.selectedElementId === elementId
-              ? undefined
-              : state.activeTemplate.selectedElementId,
-          }
-        : null,
-    })),
-    
-  selectElement: (elementId) =>
-    set((state) => ({
-      activeTemplate: state.activeTemplate
-        ? {
-            ...state.activeTemplate,
-            selectedElementId: elementId,
-          }
-        : null,
-    })),
-    
-  duplicateElement: (elementId) =>
+      templates: [...state.templates, newTemplate],
+      activeTemplate: newTemplate,
+    }));
+  },
+
+  addElement: (type, props = {}) => {
     set((state) => {
       if (!state.activeTemplate) return state;
-      
-      const elementToDuplicate = state.activeTemplate.elements.find(
-        (el) => el.id === elementId
-      );
-      
-      if (!elementToDuplicate) return state;
-      
-      const newElement = {
-        ...elementToDuplicate,
-        id: crypto.randomUUID(),
-        position: {
-          ...elementToDuplicate.position,
-          x: elementToDuplicate.position.x + 20,
-          y: elementToDuplicate.position.y + 20,
-        },
-      };
-      
+
+      const newElement = createDefaultElement(type, props);
+      const now = new Date().toISOString();
+
       return {
         activeTemplate: {
           ...state.activeTemplate,
           elements: [...state.activeTemplate.elements, newElement],
+          updatedAt: now,
         },
       };
-    }),
-    
-  moveElement: (elementId, { x, y }) =>
-    set((state) => ({
-      activeTemplate: state.activeTemplate
-        ? {
-            ...state.activeTemplate,
-            elements: state.activeTemplate.elements.map((el) =>
-              el.id === elementId
-                ? {
-                    ...el,
-                    position: {
-                      ...el.position,
-                      x,
-                      y,
-                    },
-                  }
-                : el
-            ),
-          }
-        : null,
-    })),
+    });
+  },
+
+  updateElement: (elementId, updates) => {
+    set((state) => {
+      if (!state.activeTemplate) return state;
+
+      const now = new Date().toISOString();
+      return {
+        activeTemplate: {
+          ...state.activeTemplate,
+          elements: state.activeTemplate.elements.map((element) =>
+            element.id === elementId ? { ...element, ...updates } : element
+          ),
+          updatedAt: now,
+        },
+      };
+    });
+  },
+
+  moveElement: (elementId, position) => {
+    set((state) => {
+      if (!state.activeTemplate) return state;
+
+      const now = new Date().toISOString();
+      return {
+        activeTemplate: {
+          ...state.activeTemplate,
+          elements: state.activeTemplate.elements.map((element) =>
+            element.id === elementId ? { ...element, position } : element
+          ),
+          updatedAt: now,
+        },
+      };
+    });
+  },
+
+  resizeElement: (elementId, size) => {
+    set((state) => {
+      if (!state.activeTemplate) return state;
+
+      const now = new Date().toISOString();
+      return {
+        activeTemplate: {
+          ...state.activeTemplate,
+          elements: state.activeTemplate.elements.map((element) =>
+            element.id === elementId ? { ...element, size } : element
+          ),
+          updatedAt: now,
+        },
+      };
+    });
+  },
+
+  duplicateElement: (elementId) => {
+    set((state) => {
+      if (!state.activeTemplate) return state;
+
+      const elementToDuplicate = state.activeTemplate.elements.find(
+        (element) => element.id === elementId
+      );
+
+      if (!elementToDuplicate) return state;
+
+      const newElement = {
+        ...elementToDuplicate,
+        id: uuidv4(),
+        position: {
+          x: elementToDuplicate.position.x + 20,
+          y: elementToDuplicate.position.y + 20,
+        },
+      };
+
+      const now = new Date().toISOString();
+      return {
+        activeTemplate: {
+          ...state.activeTemplate,
+          elements: [...state.activeTemplate.elements, newElement],
+          updatedAt: now,
+        },
+      };
+    });
+  },
+
+  removeElement: (elementId) => {
+    set((state) => {
+      if (!state.activeTemplate) return state;
+
+      const now = new Date().toISOString();
+      return {
+        activeTemplate: {
+          ...state.activeTemplate,
+          elements: state.activeTemplate.elements.filter(
+            (element) => element.id !== elementId
+          ),
+          updatedAt: now,
+        },
+        selectedElementId: state.selectedElementId === elementId ? null : state.selectedElementId,
+      };
+    });
+  },
+
+  setSelectedElementId: (elementId) => {
+    set({ selectedElementId: elementId });
+  },
 }));

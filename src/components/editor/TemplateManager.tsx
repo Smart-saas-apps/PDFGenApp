@@ -1,103 +1,69 @@
 import React, { useState } from 'react';
 import { useTemplateStore } from '../../store/templateStore';
-import {
-  PlusIcon,
-  DocumentIcon,
-  PencilIcon,
-  TrashIcon,
-} from '@heroicons/react/24/outline';
+import { Button } from '../ui/Button';
+import { PlusIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
 export const TemplateManager: React.FC = () => {
-  const { templates, createTemplate, setActiveTemplate } = useTemplateStore();
-  const [isCreating, setIsCreating] = useState(false);
+  const { templates, createTemplate } = useTemplateStore();
   const [newTemplateName, setNewTemplateName] = useState('');
 
   const handleCreateTemplate = () => {
     if (newTemplateName.trim()) {
       createTemplate(newTemplateName.trim());
       setNewTemplateName('');
-      setIsCreating(false);
     }
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-lg shadow">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">Templates</h2>
-        <button
-          onClick={() => setIsCreating(true)}
-          className="flex items-center px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          <PlusIcon className="w-5 h-5 mr-2" />
-          New Template
-        </button>
+    <div className="p-4">
+      <div className="mb-4">
+        <h2 className="text-lg font-medium text-gray-900 mb-2">Templates</h2>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newTemplateName}
+            onChange={(e) => setNewTemplateName(e.target.value)}
+            placeholder="New template name"
+            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+          />
+          <Button
+            onClick={handleCreateTemplate}
+            icon={<PlusIcon className="w-5 h-5" />}
+          >
+            Create
+          </Button>
+        </div>
       </div>
 
-      {isCreating && (
-        <div className="p-4 border-b bg-gray-50">
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              value={newTemplateName}
-              onChange={(e) => setNewTemplateName(e.target.value)}
-              placeholder="Template name"
-              className="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              autoFocus
-            />
-            <button
-              onClick={handleCreateTemplate}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      <div className="space-y-2">
+        {templates.map((template) => (
+          <div
+            key={template.id}
+            className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-primary-500 transition-colors"
+          >
+            <div>
+              <h3 className="font-medium text-gray-900">{template.name}</h3>
+              <p className="text-sm text-gray-500">
+                Created {new Date(template.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              icon={<DocumentDuplicateIcon className="w-5 h-5" />}
             >
-              Create
-            </button>
-            <button
-              onClick={() => setIsCreating(false)}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              Cancel
-            </button>
+              Use
+            </Button>
           </div>
-        </div>
-      )}
+        ))}
 
-      <div className="p-4">
-        {templates.length === 0 ? (
-          <p className="text-gray-500 text-center">No templates yet</p>
-        ) : (
-          <ul className="space-y-2">
-            {templates.map((template) => (
-              <li
-                key={template.id}
-                className="flex items-center justify-between p-3 border rounded hover:bg-gray-50 cursor-pointer"
-                onClick={() => setActiveTemplate(template)}
-              >
-                <div className="flex items-center space-x-3">
-                  <DocumentIcon className="w-5 h-5 text-gray-500" />
-                  <span>{template.name}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Add edit functionality
-                    }}
-                    className="p-1 text-gray-500 hover:text-blue-600"
-                  >
-                    <PencilIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Add delete functionality
-                    }}
-                    className="p-1 text-gray-500 hover:text-red-600"
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+        {templates.length === 0 && (
+          <div className="text-center py-8">
+            <DocumentDuplicateIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No templates</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Get started by creating a new template
+            </p>
+          </div>
         )}
       </div>
     </div>
