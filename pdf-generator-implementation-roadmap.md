@@ -356,13 +356,11 @@
 ## Technical Debt and Improvements
 - [ ] Add comprehensive error handling
 - [ ] Implement proper TypeScript types for all components
-- [ ] Add unit tests for core functionality
-- [ ] Optimize performance for large templates
-- [ ] Add proper documentation
+- [ ] Add loading states for async operations
+- [ ] Implement proper error boundaries
 
-## Future Considerations
-- [ ] User authentication and authorization
-- [ ] Cloud storage for templates
-- [ ] Template marketplace
-- [ ] Advanced PDF features (forms, digital signatures)
-- [ ] API integration capabilities
+## Notes
+- Using React 18 with TypeScript
+- State management with Zustand
+- PDF generation with jsPDF
+- Styling with Tailwind CSS

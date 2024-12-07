@@ -4,8 +4,9 @@ import { Button } from '../ui/Button';
 import {
   DocumentTextIcon,
   PhotoIcon,
-  Square2StackIcon,
-  CircleStackIcon,
+  SquaresPlusIcon,
+  ArrowDownTrayIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 
 export const Toolbar: React.FC = () => {
@@ -37,7 +38,7 @@ export const Toolbar: React.FC = () => {
     });
   };
 
-  const handleAddRectangle = () => {
+  const handleAddShape = () => {
     addElement({
       type: 'shape',
       shape: 'rectangle',
@@ -49,47 +50,66 @@ export const Toolbar: React.FC = () => {
     });
   };
 
-  const handleAddCircle = () => {
-    addElement({
-      type: 'shape',
-      shape: 'circle',
-      content: '',
-      position: { x: 50, y: 50 },
-      size: { width: 100, height: 100 },
-      style: {},
-      backgroundColor: '#4B5563',
-    });
+  const handleResetCanvas = () => {
+    // Implement reset canvas logic here
+  };
+
+  const handleExportPDF = () => {
+    // Implement export PDF logic here
   };
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-medium text-gray-900">Elements</h2>
+    <div className="px-4 py-2 flex items-center justify-between">
+      <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<DocumentTextIcon className="w-5 h-5" />}
+            title="Add Text"
+            onClick={handleAddText}
+          >
+            Text
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<PhotoIcon className="w-5 h-5" />}
+            title="Add Image"
+            onClick={handleAddImage}
+          >
+            Image
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<SquaresPlusIcon className="w-5 h-5" />}
+            title="Add Shape"
+            onClick={handleAddShape}
+          >
+            Shape
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2">
+
+      <div className="flex items-center space-x-2">
         <Button
-          onClick={handleAddText}
-          icon={<DocumentTextIcon className="w-5 h-5" />}
+          variant="ghost"
+          size="sm"
+          icon={<ArrowPathIcon className="w-5 h-5" />}
+          title="Reset Canvas"
+          onClick={handleResetCanvas}
         >
-          Add Text
+          Reset
         </Button>
         <Button
-          onClick={handleAddImage}
-          icon={<PhotoIcon className="w-5 h-5" />}
+          variant="primary"
+          size="sm"
+          icon={<ArrowDownTrayIcon className="w-5 h-5" />}
+          title="Export PDF"
+          onClick={handleExportPDF}
         >
-          Add Image
-        </Button>
-        <Button
-          onClick={handleAddRectangle}
-          icon={<Square2StackIcon className="w-5 h-5" />}
-        >
-          Add Rectangle
-        </Button>
-        <Button
-          onClick={handleAddCircle}
-          icon={<CircleStackIcon className="w-5 h-5" />}
-        >
-          Add Circle
+          Export PDF
         </Button>
       </div>
     </div>
