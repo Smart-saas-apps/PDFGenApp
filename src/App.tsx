@@ -6,6 +6,7 @@ import { Toolbar } from './components/editor/Toolbar';
 import { PDFPreview } from './components/editor/PDFPreview';
 import { TemplateManager } from './components/editor/TemplateManager';
 import { Card } from './components/ui/Card';
+import './styles/resizable.css';
 
 const App: React.FC = () => {
   return (
