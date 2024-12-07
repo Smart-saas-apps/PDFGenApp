@@ -1,9 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-}
-
 export interface Position {
   x: number;
   y: number;
@@ -17,32 +11,46 @@ export interface Size {
 export interface ElementStyle {
   color?: string;
   backgroundColor?: string;
-  fontSize?: string;
   fontFamily?: string;
+  fontSize?: string;
   fontWeight?: string;
-  borderWidth?: string;
-  borderStyle?: string;
-  borderColor?: string;
+  textAlign?: 'left' | 'center' | 'right';
   opacity?: number;
-  rotate?: number;
+  transform?: string;
+  [key: string]: any;
 }
 
-export type ElementType = 'text' | 'image' | 'shape' | 'table';
-
-export interface TemplateElement {
+export interface BaseTemplateElement {
   id: string;
-  type: ElementType;
+  type: string;
   position: Position;
   size: Size;
-  content: string;
   style: ElementStyle;
+  content: string;
+  zIndex?: number;
 }
+
+export interface TextElement extends BaseTemplateElement {
+  type: 'text';
+}
+
+export interface ImageElement extends BaseTemplateElement {
+  type: 'image';
+  alt?: string;
+}
+
+export interface ShapeElement extends BaseTemplateElement {
+  type: 'shape';
+  shape: 'rectangle' | 'circle';
+  backgroundColor?: string;
+}
+
+export type TemplateElement = TextElement | ImageElement | ShapeElement;
 
 export interface Template {
   id: string;
   name: string;
-  description?: string;
   elements: TemplateElement[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: number;
+  updatedAt: number;
 }
