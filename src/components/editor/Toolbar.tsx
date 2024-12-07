@@ -1,137 +1,97 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useTemplateStore } from '../../store/templateStore';
 import { Button } from '../ui/Button';
 import {
   DocumentTextIcon,
   PhotoIcon,
-  TableCellsIcon,
   Square2StackIcon,
-  DocumentDuplicateIcon,
-  TrashIcon,
+  CircleStackIcon,
 } from '@heroicons/react/24/outline';
 
 export const Toolbar: React.FC = () => {
-  const { addElement, activeTemplate, duplicateElement, removeElement } = useTemplateStore();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addElement } = useTemplateStore();
 
-  const handleAddElement = (type: 'text' | 'image' | 'shape' | 'table') => {
-    let defaultProps = {};
-    
-    switch (type) {
-      case 'text':
-        defaultProps = {
-          content: 'New Text',
-          style: {
-            fontSize: '16px',
-            fontFamily: 'Arial',
-            color: '#000000',
-          },
-        };
-        break;
-      case 'table':
-        defaultProps = {
-          content: JSON.stringify({
-            rows: 3,
-            columns: 3,
-            data: Array(3).fill(Array(3).fill('')),
-          }),
-        };
-        break;
-      case 'shape':
-        defaultProps = {
-          content: 'rectangle',
-          style: {
-            backgroundColor: '#E5E7EB',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: '#D1D5DB',
-          },
-        };
-        break;
-    }
-    
-    addElement(type, defaultProps);
+  const handleAddText = () => {
+    addElement({
+      type: 'text',
+      content: 'New Text',
+      position: { x: 50, y: 50 },
+      size: { width: 200, height: 50 },
+      style: {
+        fontFamily: 'Arial',
+        fontSize: '16px',
+        color: '#000000',
+      },
+    });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        addElement('image', {
-          content: event.target?.result as string,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleAddImage = () => {
+    // For demo, using a placeholder image
+    addElement({
+      type: 'image',
+      content: 'https://via.placeholder.com/200',
+      position: { x: 50, y: 50 },
+      size: { width: 200, height: 200 },
+      style: {},
+      alt: 'Placeholder image',
+    });
   };
 
-  const handleImageButtonClick = () => {
-    fileInputRef.current?.click();
+  const handleAddRectangle = () => {
+    addElement({
+      type: 'shape',
+      shape: 'rectangle',
+      content: '',
+      position: { x: 50, y: 50 },
+      size: { width: 100, height: 100 },
+      style: {},
+      backgroundColor: '#4B5563',
+    });
   };
 
-  const selectedElementId = activeTemplate?.selectedElementId;
+  const handleAddCircle = () => {
+    addElement({
+      type: 'shape',
+      shape: 'circle',
+      content: '',
+      position: { x: 50, y: 50 },
+      size: { width: 100, height: 100 },
+      style: {},
+      backgroundColor: '#4B5563',
+    });
+  };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white border-b">
-      <div className="flex items-center space-x-4">
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-medium text-gray-900">Elements</h2>
+      </div>
+      <div className="flex flex-wrap gap-2">
         <Button
-          onClick={() => handleAddElement('text')}
+          onClick={handleAddText}
           icon={<DocumentTextIcon className="w-5 h-5" />}
         >
-          Text
+          Add Text
         </Button>
-        
-        <div>
-          <Button
-            onClick={handleImageButtonClick}
-            icon={<PhotoIcon className="w-5 h-5" />}
-          >
-            Image
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </div>
-        
         <Button
-          onClick={() => handleAddElement('shape')}
+          onClick={handleAddImage}
+          icon={<PhotoIcon className="w-5 h-5" />}
+        >
+          Add Image
+        </Button>
+        <Button
+          onClick={handleAddRectangle}
           icon={<Square2StackIcon className="w-5 h-5" />}
         >
-          Shape
+          Add Rectangle
         </Button>
-        
         <Button
-          onClick={() => handleAddElement('table')}
-          icon={<TableCellsIcon className="w-5 h-5" />}
+          onClick={handleAddCircle}
+          icon={<CircleStackIcon className="w-5 h-5" />}
         >
-          Table
+          Add Circle
         </Button>
       </div>
-      
-      {selectedElementId && (
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="secondary"
-            onClick={() => duplicateElement(selectedElementId)}
-            icon={<DocumentDuplicateIcon className="w-5 h-5" />}
-          >
-            Duplicate
-          </Button>
-          
-          <Button
-            variant="error"
-            onClick={() => removeElement(selectedElementId)}
-            icon={<TrashIcon className="w-5 h-5" />}
-          >
-            Delete
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

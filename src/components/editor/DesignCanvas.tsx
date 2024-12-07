@@ -1,62 +1,87 @@
 import React from 'react';
 import { useTemplateStore } from '../../store/templateStore';
 import { TemplateElement } from '../../types';
+import { DraggableElement } from './DraggableElement';
 
 export const DesignCanvas: React.FC = () => {
-  const { activeTemplate } = useTemplateStore();
+  const { activeTemplate, setSelectedElementId } = useTemplateStore();
+
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setSelectedElementId(null);
+    }
+  };
 
   const renderElement = (element: TemplateElement) => {
-    const style = {
-      position: 'absolute',
-      left: `${element.position.x}px`,
-      top: `${element.position.y}px`,
-      width: `${element.size.width}px`,
-      height: `${element.size.height}px`,
+    const elementStyle = {
       ...element.style,
-    } as React.CSSProperties;
+    };
 
+    let content: React.ReactNode;
     switch (element.type) {
       case 'text':
-        return (
+        content = (
           <div
-            key={element.id}
-            style={style}
-            className="cursor-pointer"
+            style={elementStyle}
+            className="w-full h-full flex items-center"
           >
             {element.content}
           </div>
         );
+        break;
       case 'image':
-        return (
+        content = (
           <img
-            key={element.id}
             src={element.content}
             alt={element.alt || ''}
-            style={style}
-            className="cursor-pointer object-cover"
+            style={elementStyle}
+            className="w-full h-full object-cover"
           />
         );
+        break;
       case 'shape':
-        return (
+        content = (
           <div
-            key={element.id}
             style={{
-              ...style,
+              ...elementStyle,
               backgroundColor: element.backgroundColor || '#000000',
               borderRadius: element.shape === 'circle' ? '50%' : undefined,
+              width: '100%',
+              height: '100%',
             }}
-            className="cursor-pointer"
           />
         );
+        break;
       default:
         return null;
     }
+
+    return (
+      <DraggableElement key={element.id} element={element}>
+        {content}
+      </DraggableElement>
+    );
   };
 
   return (
-    <div className="relative w-full h-full bg-white shadow-sm" id="pdf-canvas">
+    <div
+      className="relative w-full h-full bg-white shadow-sm"
+      id="pdf-canvas"
+      onClick={handleCanvasClick}
+    >
       {activeTemplate ? (
         <div className="relative w-full h-full">
+          {/* Grid Background */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, #f0f0f0 1px, transparent 1px),
+                linear-gradient(to bottom, #f0f0f0 1px, transparent 1px)
+              `,
+              backgroundSize: '20px 20px',
+            }}
+          />
           {activeTemplate.elements.map(renderElement)}
         </div>
       ) : (
