@@ -68,6 +68,70 @@ export const DesignCanvas: React.FC = () => {
           />
         );
         break;
+      case 'table':
+        content = (
+          <table className="w-full h-full border-collapse" style={elementStyle}>
+            <tbody>
+              {(element.content as string[][]).map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      className="border border-gray-300 p-2"
+                      contentEditable
+                      suppressContentEditableWarning
+                      onBlur={(e) => {
+                        const newContent = [...element.content];
+                        newContent[rowIndex][cellIndex] = e.currentTarget.textContent || '';
+                        useTemplateStore.getState().updateElement(element.id, {
+                          content: newContent
+                        });
+                      }}
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        );
+        break;
+      case 'qrcode':
+        content = (
+          <div className="w-full h-full">
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                element.content
+              )}`}
+              alt="QR Code"
+              className="w-full h-full"
+            />
+          </div>
+        );
+        break;
+      case 'list':
+        content = (
+          <ul className="w-full h-full list-disc pl-5" style={elementStyle}>
+            {(element.content as string[]).map((item, index) => (
+              <li
+                key={index}
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => {
+                  const newContent = [...element.content];
+                  newContent[index] = e.currentTarget.textContent || '';
+                  useTemplateStore.getState().updateElement(element.id, {
+                    content: newContent
+                  });
+                }}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        );
+        break;
       default:
         return null;
     }

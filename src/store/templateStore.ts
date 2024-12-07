@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { Template, TemplateElement, TextElement, ImageElement, ShapeElement } from '../types';
-
-type NewElement = 
-  | Omit<TextElement, 'id'>
-  | Omit<ImageElement, 'id'>
-  | Omit<ShapeElement, 'id'>;
+import { 
+  Template, 
+  TemplateElement, 
+  NewElement,
+  TextElement,
+  ImageElement,
+  ShapeElement,
+  TableElement,
+  QRCodeElement,
+  ListElement
+} from '../types';
 
 interface TemplateStore {
   templates: Template[];
@@ -21,8 +26,11 @@ interface TemplateStore {
 
 const createNewElement = (element: NewElement): TemplateElement => {
   const baseElement = {
-    ...element,
     id: uuidv4(),
+    position: element.position,
+    size: element.size,
+    style: element.style,
+    zIndex: element.zIndex,
   };
 
   switch (element.type) {
@@ -30,17 +38,41 @@ const createNewElement = (element: NewElement): TemplateElement => {
       return {
         ...baseElement,
         type: 'text',
+        content: element.content,
       } as TextElement;
     case 'image':
       return {
         ...baseElement,
         type: 'image',
+        content: element.content,
+        alt: element.alt,
       } as ImageElement;
     case 'shape':
       return {
         ...baseElement,
         type: 'shape',
+        shape: element.shape,
+        content: element.content,
+        backgroundColor: element.backgroundColor,
       } as ShapeElement;
+    case 'table':
+      return {
+        ...baseElement,
+        type: 'table',
+        content: element.content,
+      } as TableElement;
+    case 'qrcode':
+      return {
+        ...baseElement,
+        type: 'qrcode',
+        content: element.content,
+      } as QRCodeElement;
+    case 'list':
+      return {
+        ...baseElement,
+        type: 'list',
+        content: element.content,
+      } as ListElement;
     default:
       throw new Error(`Unknown element type: ${(element as any).type}`);
   }
@@ -51,7 +83,7 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
   activeTemplate: null,
   selectedElementId: null,
 
-  createTemplate: (name: string) => {
+  createTemplate: (name) => {
     const newTemplate: Template = {
       id: uuidv4(),
       name,
@@ -66,16 +98,15 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
     }));
   },
 
-  setActiveTemplate: (template: Template) => {
+  setActiveTemplate: (template) => {
     set({ activeTemplate: template });
   },
 
-  addElement: (element: NewElement) => {
+  addElement: (element) => {
     set((state) => {
       if (!state.activeTemplate) return state;
 
       const newElement = createNewElement(element);
-
       const updatedTemplate: Template = {
         ...state.activeTemplate,
         elements: [...state.activeTemplate.elements, newElement],
@@ -92,7 +123,7 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
     });
   },
 
-  updateElement: (elementId: string, updates: Partial<TemplateElement>) => {
+  updateElement: (elementId, updates) => {
     set((state) => {
       if (!state.activeTemplate) return state;
 
@@ -100,18 +131,7 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
         ...state.activeTemplate,
         elements: state.activeTemplate.elements.map((element) => {
           if (element.id !== elementId) return element;
-
-          const updatedElement = { ...element, ...updates };
-          switch (updatedElement.type) {
-            case 'text':
-              return updatedElement as TextElement;
-            case 'image':
-              return updatedElement as ImageElement;
-            case 'shape':
-              return updatedElement as ShapeElement;
-            default:
-              return element;
-          }
+          return { ...element, ...updates } as TemplateElement;
         }),
         updatedAt: Date.now(),
       };
@@ -126,7 +146,7 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
     });
   },
 
-  deleteElement: (elementId: string) => {
+  deleteElement: (elementId) => {
     set((state) => {
       if (!state.activeTemplate) return state;
 
@@ -144,11 +164,12 @@ export const useTemplateStore = create<TemplateStore>((set) => ({
         templates: state.templates.map((t) =>
           t.id === updatedTemplate.id ? updatedTemplate : t
         ),
+        selectedElementId: null,
       };
     });
   },
 
-  setSelectedElementId: (elementId: string | null) => {
+  setSelectedElementId: (elementId) => {
     set({ selectedElementId: elementId });
   },
 }));
